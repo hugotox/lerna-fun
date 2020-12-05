@@ -1,0 +1,39 @@
+{
+  "name": "lerna-fun",
+  "version": "1.0.0",
+  "scripts": {
+    "bootstrap": "lerna bootstrap",
+    "build": "lerna run --no-bail build",
+    "run-app": "node packages/app/lib"
+  },
+  "author": "Hugo Pineda <hpineda83@gmail.com>",
+  "private": true,
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "@commitlint/cli": "^11.0.0",
+    "@commitlint/config-conventional": "^11.0.0",
+    "@commitlint/config-lerna-scopes": "^11.0.0",
+    "conventional-changelog-cli": "^2.1.1",
+    "husky": "^4.3.0",
+    "lerna": "^3.22.1",
+    "npm-license-crawler": "^0.2.1"
+  },
+  "workspaces": {
+    "packages": [
+      "packages/*"
+    ],
+    "nohoist": []
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional",
+      "@commitlint/config-lerna-scopes"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -e $GIT_PARAMS",
+      "pre-commit": "lerna run --concurrency 1 --stream --since HEAD precommit"
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "command": {
+    "publish": {
+      "allowBranch": "master",
+      "conventionalCommits": true,
+      "ignoreChanges": ["*.md", "*.lock"],
+      "message": "chore: release [ci skip]",
+      "verifyAccess": false
+    },
+    "version": {
+      "allowBranch": "master",
+      "conventionalCommits": true,
+      "ignoreChanges": ["*.md", "*.lock"],
+      "message": "chore: version [ci skip]"
+    }
+  },
+  "packages": [
+    "packages/*"
+  ],
+  "useWorkspaces": true,
+  "npmClient": "yarn",
+  "version": "independent"
+}
