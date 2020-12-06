@@ -92,7 +92,7 @@ jobs:
       - run:
           name: Checking for changed packages
           command: |
-            if (./node_modules/.bin/lerna changed --all | grep -E '^(@zcode|npr|nzr).*'); then
+            if (./node_modules/.bin/lerna changed --all); then
               echo "Found packages ready to publish, continuing..."
             else
               echo "No changed package"
@@ -113,7 +113,7 @@ jobs:
 
 workflows:
   version: 2.1
-  nzr-build-container:
+  build-container:
     jobs:  
       - build-test
       - publish:
