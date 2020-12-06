@@ -4,7 +4,8 @@
   "scripts": {
     "bootstrap": "lerna bootstrap",
     "build": "lerna run --no-bail build",
-    "run-app": "node packages/app/lib"
+    "run-app": "node packages/app/lib",
+    "publish": "lerna publish --no-verify-registry"
   },
   "author": "Hugo Pineda <hpineda83@gmail.com>",
   "private": true,

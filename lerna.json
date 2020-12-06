@@ -1,14 +1,14 @@
 {
   "command": {
     "publish": {
-      "allowBranch": "master",
+      "allowBranch": "main",
       "conventionalCommits": true,
       "ignoreChanges": ["*.md", "*.lock"],
       "message": "chore: release [ci skip]",
       "verifyAccess": false
     },
     "version": {
-      "allowBranch": "master",
+      "allowBranch": "main",
       "conventionalCommits": true,
       "ignoreChanges": ["*.md", "*.lock"],
       "message": "chore: version [ci skip]"

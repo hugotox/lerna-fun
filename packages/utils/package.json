@@ -8,6 +8,10 @@
   },
   "author": "Hugo Pineda <hpineda83@gmail.com>",
   "license": "UNLICENSED",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://zumper.jfrog.io/zumper/api/npm/npm-local/"
+  },
   "devDependencies": {
     "@babel/cli": "^7.12.8",
     "@babel/core": "^7.12.9",
