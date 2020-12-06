@@ -60,6 +60,9 @@ jobs:
       - install-packages:
           flag: "--no-progress"
       - run:
+          name: Build packages
+          command: yarn build
+      - run:
           name: Lint
           command: yarn lint
       - run:
