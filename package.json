@@ -4,6 +4,8 @@
   "scripts": {
     "bootstrap": "lerna bootstrap",
     "build": "lerna run --no-bail build",
+    "lint": "lerna run --no-bail lint",
+    "test": "lerna run --no-bail test",
     "run-app": "node packages/app/lib",
     "publish": "lerna publish --no-verify-registry"
   },

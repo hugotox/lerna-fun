@@ -1,0 +1,124 @@
+version: 2.1
+
+executors:
+  default:
+    environment:
+      DOCKER_BUILDKIT: 1
+    docker:
+      - image: circleci/node:12.14.1
+    working_directory: ~/code
+
+# Reusable commands
+commands:
+  artifactory:
+    description: "Create .npmrc to support artifactory"
+    steps:
+      - run:
+          name: "Configure Artifactory"
+          command: |
+            touch ${HOME}/.npmrc
+            echo "@zcode:registry=https://zumper.jfrog.io/zumper/api/npm/npm/" >> ${HOME}/.npmrc
+            echo "@zcode-ui:registry=https://zumper.jfrog.io/zumper/api/npm/npm/" >> ${HOME}/.npmrc
+            echo "@zumper:registry=https://zumper.jfrog.io/zumper/api/npm/npm/" >> ${HOME}/.npmrc
+            echo "@hugotox:registry=https://zumper.jfrog.io/zumper/api/npm/npm/" >> ${HOME}/.npmrc
+            AUTH_TOKEN=$(echo -n "${ARTIFACTORY_USERNAME}:${ARTIFACTORY_PASSWORD}" | base64 -w0)
+            echo "_auth=$AUTH_TOKEN" >> ${HOME}/.npmrc
+            echo "email=${ARTIFACTORY_USERNAME}@zumper.com" >> ${HOME}/.npmrc
+            echo "always-auth=true" >> ${HOME}/.npmrc
+  install-packages:
+    description: "Installing node_modules dependencies"
+    parameters:
+      flag:
+        type: string
+        default: ""
+      frozen-lockfile:
+        type: boolean
+        default: true
+    steps:
+      - restore_cache:
+          keys:
+            - yarn-packages-v1-{{ .Branch }}-{{ checksum "yarn.lock" }}-{{ arch }}
+            - yarn-packages-v1-{{ checksum "yarn.lock" }}-{{ arch }}
+            - yarn-packages-v1-{{ arch }}
+          name: Restoring Cache
+      - run:
+          name: yarn install << parameters.flag >>
+          command: |
+            yarn install --cache-folder ~/.cache/yarn << parameters.flag >> \
+              <<# parameters.frozen-lockfile >> --frozen-lockfile <</ parameters.frozen-lockfile >>
+      - save_cache:
+          paths:
+            - ~/.cache/yarn
+          key: yarn-packages-v1-{{ .Branch }}-{{ checksum "yarn.lock" }}-{{ arch }}
+
+jobs:
+  build-test:
+    executor: default
+    steps:
+      - checkout
+      - artifactory
+      - install-packages:
+          flag: "--no-progress"
+      - run:
+          name: Lint
+          command: yarn lint
+      - run:
+          name: Test
+          command: yarn test
+
+  publish:
+    executor: default
+    steps:
+      - run:
+          name: Skip publish on non-main branch
+          command: |
+            echo "$CIRCLE_TAG"
+            if [ "$CIRCLE_TAG" ] || [ "$CIRCLE_BRANCH" != "main" ]; then
+              circleci-agent step halt
+            fi
+      - add_ssh_keys:
+          fingerprints:
+            - "5c:c1:96:fb:fc:0a:c5:a1:06:5f:c6:dd:e2:61:07:1d"
+      - checkout
+      - artifactory
+      - install-packages:
+          flag: "--no-progress"
+      - run:
+          name: Build packages
+          command: yarn build
+      - run:
+          name: Checking for changed packages
+          command: |
+            if (./node_modules/.bin/lerna changed --all | grep -E '^(@zcode|npr|nzr).*'); then
+              echo "Found packages ready to publish, continuing..."
+            else
+              echo "No changed package"
+              circleci-agent step halt
+            fi
+      - run:
+          name: Publish packages
+          command: |
+            git config --global user.email "domain@zumper.com" &&
+            git config --global user.name "zumper-domain" &&
+            yarn run publish --ignore-scripts --yes --no-push &&
+            git pull &&
+            git push --follow-tags --no-verify --atomic origin main
+          environment:
+            GIT_AUTHOR_NAME: "zumper-domain"
+            GIT_COMMITTER_NAME: "zumper-domain"
+            GIT_AUTHOR_EMAIL: "domain@zumper.com"
+
+workflows:
+  version: 2.1
+  nzr-build-container:
+    jobs:  
+      - build-test:
+          context: zumper-global
+      - publish:
+          context: zumper-global
+          requires:
+            - build-test
+          filters:
+            branches:
+              only:
+                - main
