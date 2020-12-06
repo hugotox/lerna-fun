@@ -112,7 +112,7 @@ workflows:
   version: 2.1
   nzr-build-container:
     jobs:  
-      - build-test:
+      - build-test
       - publish:
           requires:
             - build-test
