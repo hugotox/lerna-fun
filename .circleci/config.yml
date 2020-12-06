@@ -113,9 +113,7 @@ workflows:
   nzr-build-container:
     jobs:  
       - build-test:
-          context: zumper-global
       - publish:
-          context: zumper-global
           requires:
             - build-test
           filters:
