@@ -79,7 +79,7 @@ jobs:
             fi
       - add_ssh_keys:
           fingerprints:
-            - "9c:1b:0e:02:53:ef:bd:94:6c:94:be:9e:ea:fc:5a:07"
+            - "5c:c1:96:fb:fc:0a:c5:a1:06:5f:c6:dd:e2:61:07:1d"
       - checkout
       - artifactory
       - install-packages:
