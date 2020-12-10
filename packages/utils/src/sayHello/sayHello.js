@@ -3,5 +3,5 @@
  * @param {string} Name to say Hello to
  */
 export const sayHello = (Name) => {
-  return `Hello, ${Name} - 1`
+  return `Hello, ${Name} - 2`
 }
